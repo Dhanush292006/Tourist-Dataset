@@ -13,7 +13,7 @@ st.write("Regression | Classification | Recommendation System")
 
 @st.cache_data
 def load_data():
-    transaction = pd.read_excel("Transaction.xlsx")
+    transaction = pd.read_excel("data/Transaction.xlsx")
     user = pd.read_excel("User.xlsx")
     city = pd.read_excel("City.xlsx")
     region = pd.read_excel("Region.xlsx")
