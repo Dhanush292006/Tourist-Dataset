@@ -12,26 +12,25 @@ def load_data():
 
 df = load_data()
 
-# ---------------- KPIs ----------------
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric("Total Transactions", len(df))
-col2.metric("Unique Users", df["UserId"].nunique())
-col3.metric("Average Rating", round(df["Rating"].mean(), 2))
-col4.metric("Unique Attractions", df["AttractionId"].nunique())
-
-st.divider()
-
 # ---------------- Filters ----------------
 st.sidebar.header("Filter Data")
 
-year_filter = st.sidebar.multiselect(
+year_filter = st.sidebar.selectbox(
     "Select Year",
-    options=sorted(df["VisitYear"].unique()),
-    default=sorted(df["VisitYear"].unique())
+    sorted(df["VisitYear"].unique())
 )
 
-filtered_df = df[df["VisitYear"].isin(year_filter)]
+filtered_df = df[df["VisitYear"] == year_filter]
+
+# ---------------- KPIs ----------------
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("Total Transactions", len(filtered_df))
+col2.metric("Unique Users", filtered_df["UserId"].nunique())
+col3.metric("Average Rating", round(filtered_df["Rating"].mean(), 2))
+col4.metric("Unique Attractions", filtered_df["AttractionId"].nunique())
+
+st.divider()
 
 # ---------------- Charts ----------------
 st.subheader("📊 Visits by Year")
