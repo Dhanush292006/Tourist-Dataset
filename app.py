@@ -2,17 +2,19 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# ---------------- Page Config ----------------
 st.set_page_config(page_title="Tourist Analytics Dashboard", layout="wide")
 
 st.title("🌍 Tourist Analytics Dashboard")
 
+# ---------------- Load Data ----------------
 @st.cache_data
 def load_data():
     return pd.read_excel("Transaction.xlsx")
 
 df = load_data()
 
-# ---------------- Filters ----------------
+# ---------------- Sidebar Filters ----------------
 st.sidebar.header("Filter Data")
 
 # Year Filter
@@ -36,7 +38,7 @@ mode_filter = st.sidebar.multiselect(
     default=df["VisitMode"].unique()
 )
 
-# Rating Filter
+# Rating Range Filter
 rating_filter = st.sidebar.slider(
     "Select Rating Range",
     int(df["Rating"].min()),
@@ -44,7 +46,7 @@ rating_filter = st.sidebar.slider(
     (int(df["Rating"].min()), int(df["Rating"].max()))
 )
 
-# Apply Filters
+# ---------------- Apply Filters ----------------
 filtered_df = df[
     (df["VisitYear"].isin(year_filter)) &
     (df["Continent"].isin(continent_filter)) &
@@ -64,21 +66,26 @@ col4.metric("Unique Attractions", filtered_df["AttractionId"].nunique())
 st.divider()
 
 # ---------------- Charts ----------------
+
+# Visits by Year
 st.subheader("📊 Visits by Year")
 year_chart = filtered_df["VisitYear"].value_counts().reset_index()
 year_chart.columns = ["Year", "Visits"]
-fig1 = px.bar(year_chart, x="Year", y="Visits")
+fig1 = px.bar(year_chart, x="Year", y="Visits", color="Visits")
 st.plotly_chart(fig1, use_container_width=True)
 
+# Rating Distribution
 st.subheader("⭐ Rating Distribution")
-fig2 = px.histogram(filtered_df, x="Rating")
+fig2 = px.histogram(filtered_df, x="Rating", nbins=10, color="Rating")
 st.plotly_chart(fig2, use_container_width=True)
 
+# Visit Mode Distribution
 st.subheader("🚗 Visit Mode Distribution")
 mode_chart = filtered_df["VisitMode"].value_counts().reset_index()
 mode_chart.columns = ["Mode", "Count"]
 fig3 = px.pie(mode_chart, names="Mode", values="Count")
 st.plotly_chart(fig3, use_container_width=True)
 
+# ---------------- Dataset Preview ----------------
 st.subheader("📋 Dataset Preview")
-st.dataframe(filtered_df.head())
+st.dataframe(filtered_df.head(20))
