@@ -10,23 +10,20 @@ st.title("🌍 Tourist Analytics Dashboard")
 # ---------------- Load Data ----------------
 @st.cache_data
 def load_data():
-    # Load all required files
     transaction = pd.read_excel("Transaction.xlsx")
     user = pd.read_excel("User.xlsx")
     continent = pd.read_excel("Continent.xlsx")
-    mode = pd.read_excel("Mode.xlsx")
 
-    # Merge transaction with user
+    # Merge user
     df = transaction.merge(user, on="UserId", how="left")
 
-    # Merge continent to get continent names
+    # Merge continent
     df = df.merge(continent, on="ContinentId", how="left")
-
-    # Merge mode to get visit mode names (Business, Family, etc.)
-    df = df.merge(mode, on="VisitModeId", how="left")
 
     # Clean column names
     df.columns = df.columns.str.strip()
+    df.columns = df.columns.str.replace(" ", "")
+    df.columns = df.columns.str.replace("_", "")
 
     return df
 
