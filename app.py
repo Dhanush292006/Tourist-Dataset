@@ -10,44 +10,55 @@ st.title("🌍 Tourist Analytics Dashboard")
 # ---------------- Load Data ----------------
 @st.cache_data
 def load_data():
+    # Load all required files
     transaction = pd.read_excel("Transaction.xlsx")
     user = pd.read_excel("User.xlsx")
     continent = pd.read_excel("Continent.xlsx")
     mode = pd.read_excel("Mode.xlsx")
 
+    # Merge transaction with user
     df = transaction.merge(user, on="UserId", how="left")
+
+    # Merge continent to get continent names
     df = df.merge(continent, on="ContinentId", how="left")
+
+    # Merge mode to get visit mode names (Business, Family, etc.)
     df = df.merge(mode, on="VisitModeId", how="left")
 
-    df.columns = df.columns.str.strip()  # Remove hidden spaces
+    # Clean column names
+    df.columns = df.columns.str.strip()
 
     return df
 
+
+# 🔥 Important: Load dataframe
+df = load_data()
+
 # ---------------- Sidebar Filters ----------------
-st.sidebar.header("Filter Data")
+st.sidebar.header("🔎 Filter Data")
 
 # Year Filter
 year_filter = st.sidebar.multiselect(
     "Select Year",
-    sorted(df["VisitYear"].unique()),
-    default=sorted(df["VisitYear"].unique())
+    sorted(df["VisitYear"].dropna().unique()),
+    default=sorted(df["VisitYear"].dropna().unique())
 )
 
-# Continent Filter
+# Continent Filter (Text, not ID)
 continent_filter = st.sidebar.multiselect(
     "Select Continent",
-    df["Continent"].unique(),
-    default=df["Continent"].unique()
+    df["Continent"].dropna().unique(),
+    default=df["Continent"].dropna().unique()
 )
 
-# Visit Mode Filter
+# Visit Mode Filter (Text, not ID)
 mode_filter = st.sidebar.multiselect(
     "Select Visit Mode",
-    df["VisitMode"].unique(),
-    default=df["VisitMode"].unique()
+    df["VisitMode"].dropna().unique(),
+    default=df["VisitMode"].dropna().unique()
 )
 
-# Rating Range Filter
+# Rating Filter
 rating_filter = st.sidebar.slider(
     "Select Rating Range",
     int(df["Rating"].min()),
@@ -88,11 +99,11 @@ st.subheader("⭐ Rating Distribution")
 fig2 = px.histogram(filtered_df, x="Rating", nbins=10, color="Rating")
 st.plotly_chart(fig2, use_container_width=True)
 
-# Visit Mode Distribution
+# Visit Mode Distribution (Shows names like Business, Family, Couples)
 st.subheader("🚗 Visit Mode Distribution")
 mode_chart = filtered_df["VisitMode"].value_counts().reset_index()
-mode_chart.columns = ["Mode", "Count"]
-fig3 = px.pie(mode_chart, names="Mode", values="Count")
+mode_chart.columns = ["Visit Mode", "Count"]
+fig3 = px.pie(mode_chart, names="Visit Mode", values="Count")
 st.plotly_chart(fig3, use_container_width=True)
 
 # ---------------- Dataset Preview ----------------
