@@ -15,17 +15,13 @@ def load_data():
     continent = pd.read_excel("Continent.xlsx")
     mode = pd.read_excel("Mode.xlsx")
 
-    # Merge transaction + user
     df = transaction.merge(user, on="UserId", how="left")
-
-    # Merge continent using ContinentId
     df = df.merge(continent, on="ContinentId", how="left")
-
-    # Merge visit mode using VisitModeId
     df = df.merge(mode, on="VisitModeId", how="left")
 
-    return df
+    df.columns = df.columns.str.strip()  # Remove hidden spaces
 
+    return df
 
 # ---------------- Sidebar Filters ----------------
 st.sidebar.header("Filter Data")
