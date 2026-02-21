@@ -15,12 +15,43 @@ df = load_data()
 # ---------------- Filters ----------------
 st.sidebar.header("Filter Data")
 
-year_filter = st.sidebar.selectbox(
+# Year Filter
+year_filter = st.sidebar.multiselect(
     "Select Year",
-    sorted(df["VisitYear"].unique())
+    sorted(df["VisitYear"].unique()),
+    default=sorted(df["VisitYear"].unique())
 )
 
-filtered_df = df[df["VisitYear"] == year_filter]
+# Continent Filter
+continent_filter = st.sidebar.multiselect(
+    "Select Continent",
+    df["Continent"].unique(),
+    default=df["Continent"].unique()
+)
+
+# Visit Mode Filter
+mode_filter = st.sidebar.multiselect(
+    "Select Visit Mode",
+    df["VisitMode"].unique(),
+    default=df["VisitMode"].unique()
+)
+
+# Rating Filter
+rating_filter = st.sidebar.slider(
+    "Select Rating Range",
+    int(df["Rating"].min()),
+    int(df["Rating"].max()),
+    (int(df["Rating"].min()), int(df["Rating"].max()))
+)
+
+# Apply Filters
+filtered_df = df[
+    (df["VisitYear"].isin(year_filter)) &
+    (df["Continent"].isin(continent_filter)) &
+    (df["VisitMode"].isin(mode_filter)) &
+    (df["Rating"] >= rating_filter[0]) &
+    (df["Rating"] <= rating_filter[1])
+]
 
 # ---------------- KPIs ----------------
 col1, col2, col3, col4 = st.columns(4)
