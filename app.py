@@ -10,9 +10,22 @@ st.title("🌍 Tourist Analytics Dashboard")
 # ---------------- Load Data ----------------
 @st.cache_data
 def load_data():
-    return pd.read_excel("Transaction.xlsx")
+    transaction = pd.read_excel("Transaction.xlsx")
+    user = pd.read_excel("User.xlsx")
+    continent = pd.read_excel("Continent.xlsx")
+    mode = pd.read_excel("Mode.xlsx")
 
-df = load_data()
+    # Merge transaction + user
+    df = transaction.merge(user, on="UserId", how="left")
+
+    # Merge continent using ContinentId
+    df = df.merge(continent, on="ContinentId", how="left")
+
+    # Merge visit mode using VisitModeId
+    df = df.merge(mode, on="VisitModeId", how="left")
+
+    return df
+
 
 # ---------------- Sidebar Filters ----------------
 st.sidebar.header("Filter Data")
